@@ -22,6 +22,10 @@ import { metFetchCurrentWeather, metFetchCityForecast } from '@/api/metNoApi'
 
 const API_URL = 'https://api.open-meteo.com/v1/forecast'
 
+// 서버가 과부하일 때 응답 없이 멈춰 있으면 화면이 계속 '불러오는 중'에 머뭅니다.
+// 8초 안에 답이 없으면 끊고 다음 API(MET Norway)로 넘어갑니다.
+export const REQUEST_TIMEOUT_MS = 8000
+
 // 11개 도시 정보 (국내 3개 + 해외 8개)
 export const CITIES = [
   {
@@ -365,7 +369,9 @@ const meteoFetchCurrentWeather = async () => {
     wind_speed_unit: 'ms',
   })
 
-  const res = await fetch(`${API_URL}?${params}`)
+  const res = await fetch(`${API_URL}?${params}`, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  })
   if (!res.ok) throw new Error(`날씨 API 응답 오류: ${res.status}`)
 
   const list = toArray(await res.json())
@@ -492,7 +498,9 @@ const meteoFetchCityForecast = async (city) => {
     wind_speed_unit: 'ms', // 화면 표기(m/s)와 단위를 일치시킵니다
   })
 
-  const res = await fetch(`${API_URL}?${params}`)
+  const res = await fetch(`${API_URL}?${params}`, {
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+  })
   if (!res.ok) throw new Error(`날씨 API 응답 오류: ${res.status}`)
 
   const data = await res.json()

@@ -9,7 +9,8 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: process.env.NODE_ENV === 'production' ? '/skala-vue/' : '/',
+  // GitHub Pages 주소(https://jinsu1011.github.io/SKALA_Weather_project/)의 하위 경로와 일치해야 합니다.
+  base: process.env.NODE_ENV === 'production' ? '/SKALA_Weather_project/' : '/',
   plugins: [
     vue(),
     vueDevTools(),
@@ -47,8 +48,9 @@ export default defineConfig({
         description: '3D 지구본으로 보는 실시간 도시 날씨 · 24시간/10일 예보',
         lang: 'ko',
         // 홈 화면에서 실행했을 때 열릴 주소
-        start_url: '/',
-        scope: '/',
+        // base 경로 아래에서 열리도록 상대 경로를 씁니다 (GitHub Pages 하위 경로 대응)
+        start_url: './',
+        scope: './',
         // standalone = 주소창 없이 진짜 앱처럼 전체 화면으로 실행
         display: 'standalone',
         orientation: 'portrait',

@@ -24,6 +24,9 @@ const SUNRISE_URL = 'https://api.met.no/weatherapi/sunrise/3.0/sun'
 
 const round1 = (v) => Math.round((v ?? 0) * 10) / 10
 
+// 응답이 없을 때 무한정 기다리지 않도록 8초 뒤 끊는다 (weatherApi.js 의 REQUEST_TIMEOUT_MS 와 같은 값)
+const TIMEOUT_MS = 8000
+
 /* ────────────────────────────────────────────────────────────
  *  symbol_code → 한국어 문구 + 우리 앱의 group
  *  예) 'lightrainshowers_day' → 약한 소나기 / rain / 낮
@@ -147,6 +150,7 @@ const isDaytime = (date, timeZone) => {
 const fetchRaw = async (city, endpoint = 'compact') => {
   const res = await axios.get(`${FORECAST_URL}/${endpoint}`, {
     params: { lat: city.lat, lon: city.lon },
+    timeout: TIMEOUT_MS,
   })
   return res.data.properties.timeseries ?? []
 }
@@ -234,6 +238,7 @@ export const metFetchCityForecast = async (city) => {
           date: today,
           offset: tzOffset(new Date(), city.timezone),
         },
+        timeout: TIMEOUT_MS,
       })
       // 일출 API 가 실패해도 본 화면은 살아야 한다
       .catch(() => null),
